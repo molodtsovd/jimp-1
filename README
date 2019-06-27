@@ -1,0 +1,33 @@
+
+JIMP package implements Bayesian self-consistent joint inversion of geophysical data for chemical composition of crystalline crust and uppermost mantle. 
+
+Currently supported data are active-source seismic refraction traveltimes, gravity and surface elevation. Geophysical and heat conduction problems are solved in 2D approximation.
+
+To account for metastable petrologies, chemical composition of the model is parameterized by proportions of mineral phases within the crystalline crust and bound water content in the uppermost mantle. Additional unknowns are geometry of the crustal layers, including basement surface and Moho. Elastic moduli and density are predicted from mineralogy at the local pressure and temperature, relying on Perple_X database (Holland and Powell, 2002). 
+
+To deal with highly multimodal posterior PDF, MCMC with Parallel Tempering is used and analysis of the sampled PDF is performed using Gaussian Mixture model.
+
+The main code of the inversion and post-processing/plotting routines are implemented as Python scripts heavily relying on NumPy. Forward solvers are implemented in C/C++ and Fortran and are called as shared objects via Ctypes interface.
+
+MPI is used for parallelization between the chains in Parallel tempering algorithm. Forward solvers are parallelized via OpenMP, so that each chain can possibly make use of multiple CPUs with shared memory. 
+
+Seismic forward modelling is based on FDTIMES code by Pascal Podvin (P. Podvin & I. Lecomte, 1991, Finite difference computation of traveltimes in very contrasted velocity model : a massively parallel approach and its associated tools, Geophys. J. Intern., 105, 271-284, 1991). 
+
+The code is organized as follows:
+main.py - inversion
+./tt3d - seismic forward solver
+tt3d.py - Ctypes interface
+./grav - gravity and isostasy forward solver
+gravity.py - Ctypes interface
+./compro - mineral physics and heat conduction solvers, reference petrological models
+compro.py - Ctypes interface
+ownplt.py - plotting subroutines
+proc.py - analysis of the posterior PDF sampling: selection/filtering of samples, marginal PDFs, Gaussian Mixture Model analysis, mean/covariance estimates for GMM components, etc.
+
+For testing purposes, synthetic dataset based on RAPIDS4 wide-angle seismic profile (Porcupine Basin) is included (./test). Results were presented at AGU 2018 and EGU 2019 (see ./posters).
+
+Requirements:
+gcc
+Python >3.6 
+NumPy + SciPy
+

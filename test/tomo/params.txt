@@ -1,0 +1,59 @@
+Alpha=0.1
+
+	// inversion parameters
+	L1_eps = 1.e-6;
+	w_x = 10.;
+	w_y = 10.;
+	w_z = 1.;
+	w_p = 1.e-2;
+	w_fix = 100;
+	useLim = true;
+	s_max = 1./1.2;
+	s_min = 1./10.;
+
+	// model dimensions
+	ny = 463;//232;//
+	nz = 83;//42;//
+	nx = 4;
+	h = 0.5;
+
+	// starting model...
+	double dvdz = (v_max - v0)/sqrt(40.);
+	m[i*Neyz + j*nez + k] = 1. / (dvdz * sqrt(k * h) + v0);
+	
+	
+	sigma_x = 0.;//(nx-1) * h / 10;
+	sigma_y = 0.;//(ny-1) * h / 10;
+	sigma_z = 0;//(nz-1) * h / 10;
+	iterLim = 30;
+
+	for(Stage = 0; Stage < 10; ++Stage)
+	{
+		updateAlpha(Alpha);
+		
+		if(LBFGSpp())
+			break;
+
+		Alpha /= 2.;
+		sigma_x /= 10.;
+		sigma_y /= 10.;
+		sigma_z /= 10.;
+	}
+
+	
+// L-BFGS
+
+	// Set up parameters
+    LBFGSParam<double> param;
+    param.epsilon = 1e-6;
+    param.max_iterations = iterLim;
+	param.linesearch = LBFGS_LINESEARCH_BACKTRACKING_ARMIJO;
+	param.past = 2;
+	param.delta = 1.e-2;
+
+	
+			//m_drt *= (ys / yy);
+			f.precond(m_drt, 1.e-3); // SOR omega=1.95
+	
+	
+	
